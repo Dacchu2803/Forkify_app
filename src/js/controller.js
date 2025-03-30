@@ -1,5 +1,7 @@
 import * as model from './model.js'
 import recipeView from './views/recipeView.js';
+import searchView from './views/searchView.js';
+import resultsView from './views/resultsView.js';
 
 
 const timeout = function (s) {
@@ -14,6 +16,9 @@ const timeout = function (s) {
 // https://forkify-api.jonas.io
 
 ///////////////////////////////////////
+if(module.hot){
+  module.hot.accept();
+}
 
 const controlRecipes = async function() {
   try{
@@ -30,13 +35,28 @@ const controlRecipes = async function() {
   recipeView.render(model.state.recipe);
 
 
-    console.log(recipe);
+    // console.log(recipe);
   }catch(err){
     recipeView.renderError();
   }
 };
 
+const controlSearchResults =  async function(){
+try{
+  resultsView.renderSpinner();
+  const query = searchView.getQuery();
+  if(!query) return;
+  await model.loadSearchResults(query);
+  // console.log(model.state.search.results);
+  resultsView.render(model.state.search.results);
+}catch(err){
+  console.log(err);
+}
+}
+
+
 const init = function(){
   recipeView.addHandlerRender(controlRecipes);
+  searchView.addHandleSearch(controlSearchResults);
 };
 init();
