@@ -1,8 +1,6 @@
 import * as model from './model.js'
-
-import icons from "url:../img/icons.svg";
 import recipeView from './views/recipeView.js';
-const recipeContainer = document.querySelector('.recipe');
+
 
 const timeout = function (s) {
   return new Promise(function (_, reject) {
@@ -17,24 +15,13 @@ const timeout = function (s) {
 
 ///////////////////////////////////////
 
-const renderSpinner = function(parentEl){
-  const markUp = 
-  `<div class="spinner">
-          <svg>
-            <use href="${icons}#icon-loader"></use>
-          </svg>
-        </div>`;
-    parentEl.innerHTML = '';
-    parentEl.insertAdjacentHTML('afterbegin',markUp); 
-}
-
 const controlRecipes = async function() {
   try{
   const id = window.location.hash.slice(1);
 
   if(!id) return;
 
-  renderSpinner(recipeContainer);
+  recipeView.renderSpinner();
 
   await model.loadRecipe(id);
 
@@ -45,9 +32,11 @@ const controlRecipes = async function() {
 
     console.log(recipe);
   }catch(err){
-    alert(err);
+    recipeView.renderError();
   }
-}
+};
 
-window.addEventListener('hashchange',controlRecipes);
-window.addEventListener('load',controlRecipes);
+const init = function(){
+  recipeView.addHandlerRender(controlRecipes);
+};
+init();
